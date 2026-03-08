@@ -1372,25 +1372,32 @@ const COLOURS = [
 
 const sc = document.getElementById('scribbleCanvas');
 const sctx = sc.getContext('2d');
-let scW, scH;
+let scW = 800, scH = 440;
 let painting = false;
+let lastX = 0, lastY = 0;
 let scColour = '#ff4757';
 let scSize = 8;
-let scTool = 'pen'; // pen | eraser | fill
+let scTool = 'pen';
 let undoStack = [];
 
 function resizeScribble() {
-  const w = sc.parentElement.offsetWidth;
-  // Save current drawing
-  const img = sctx.getImageData(0, 0, sc.width, sc.height);
-  sc.width = w;
+  // Snapshot current pixels before resizing wipes them
+  let snapshot = null;
+  if (sc.width > 0 && sc.height > 0) {
+    try { snapshot = sctx.getImageData(0, 0, sc.width, sc.height); } catch(e) {}
+  }
+  const w = sc.parentElement ? sc.parentElement.offsetWidth : 800;
+  sc.width  = w;
   sc.height = Math.round(w * 0.55);
-  scW = sc.width; scH = sc.height;
-  // White background
+  scW = sc.width;
+  scH = sc.height;
+  // Always fill white first
   sctx.fillStyle = '#ffffff';
   sctx.fillRect(0, 0, scW, scH);
-  // Restore drawing if same size
-  try { sctx.putImageData(img, 0, 0); } catch(e) {}
+  // Restore previous drawing
+  if (snapshot) {
+    try { sctx.putImageData(snapshot, 0, 0); } catch(e) {}
+  }
 }
 
 function initScribble() {
@@ -1467,30 +1474,33 @@ function startDraw(e) {
   }
   saveUndo();
   painting = true;
+  lastX = x;
+  lastY = y;
+  // Draw a dot on click/tap
   sctx.beginPath();
-  sctx.moveTo(x, y);
-  // Dot on click
-  sctx.lineCap = 'round';
-  sctx.lineJoin = 'round';
-  sctx.lineWidth = scTool === 'eraser' ? scSize * 3 : scSize;
-  sctx.strokeStyle = scTool === 'eraser' ? '#ffffff' : scColour;
-  sctx.lineTo(x + 0.1, y + 0.1);
-  sctx.stroke();
+  sctx.arc(x, y, (scTool === 'eraser' ? scSize * 1.5 : scSize) / 2, 0, Math.PI * 2);
+  sctx.fillStyle = scTool === 'eraser' ? '#ffffff' : scColour;
+  sctx.fill();
 }
 
 function draw(e) {
   e.preventDefault();
   if (!painting) return;
   const { x, y } = getScPos(e);
+  sctx.beginPath();
+  sctx.moveTo(lastX, lastY);
   sctx.lineTo(x, y);
+  sctx.lineCap = 'round';
+  sctx.lineJoin = 'round';
+  sctx.lineWidth = scTool === 'eraser' ? scSize * 3 : scSize;
+  sctx.strokeStyle = scTool === 'eraser' ? '#ffffff' : scColour;
   sctx.stroke();
+  lastX = x;
+  lastY = y;
 }
 
-function stopDraw(e) {
-  if (painting) {
-    sctx.closePath();
-    painting = false;
-  }
+function stopDraw() {
+  painting = false;
 }
 
 // Flood fill (bucket tool)
