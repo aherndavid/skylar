@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skylar's World ⚽</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #2ecc71;
+    --dark-green: #1a8a47;
+    --pitch: #27ae60;
+    --yellow: #f9ca24;
+    --pink: #ff6b9d;
+    --white: #ffffff;
+    --sky: #74b9ff;
+    --dark: #1e272e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(135deg, #1e272e 0%, #2d3436 100%);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Floating stars */
+  .stars {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .star {
+    position: absolute;
+    width: 4px; height: 4px;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle 3s infinite alternate;
+  }
+  @keyframes twinkle {
+    from { opacity: 0.2; transform: scale(1); }
+    to { opacity: 1; transform: scale(1.5); }
+  }
+
+  header {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 40px 20px 20px;
+  }
+
+  .title-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--green), var(--dark-green));
+    border-radius: 50px;
+    padding: 8px 28px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 13px;
+    color: white;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 20px rgba(46,204,113,0.4);
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(48px, 10vw, 90px);
+    color: white;
+    line-height: 1;
+    text-shadow: 4px 4px 0 var(--dark-green), 8px 8px 0 rgba(0,0,0,0.3);
+    margin-bottom: 10px;
+  }
+  h1 span { color: var(--yellow); }
+
+  .subtitle {
+    font-size: 18px;
+    color: rgba(255,255,255,0.7);
+    font-weight: 600;
+    margin-bottom: 30px;
+  }
+
+  /* Game container */
+  .game-section {
+    position: relative;
+    z-index: 10;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+
+  .game-card {
+    background: rgba(255,255,255,0.05);
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+
+  .game-header {
+    background: linear-gradient(135deg, var(--dark-green), #145a32);
+    padding: 18px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .game-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 22px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .score-board {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .score-pill {
+    background: rgba(0,0,0,0.3);
+    border-radius: 50px;
+    padding: 6px 18px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 20px;
+    color: var(--yellow);
+    min-width: 80px;
+    text-align: center;
+  }
+
+  .score-label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    text-align: center;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  #gameCanvas {
+    display: block;
+    width: 100%;
+    background: #1a5c2a;
+    cursor: pointer;
+  }
+
+  .game-footer {
+    background: rgba(0,0,0,0.3);
+    padding: 14px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .controls-hint {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    font-weight: 600;
+  }
+  .controls-hint span { color: var(--green); }
+
+  .btn {
+    background: linear-gradient(135deg, var(--green), var(--dark-green));
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 10px 28px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 15px rgba(46,204,113,0.4);
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(46,204,113,0.5); }
+  .btn:active { transform: translateY(0); }
+
+  /* High score */
+  .stats-row {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+
+  .stat-card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 16px 28px;
+    text-align: center;
+    min-width: 120px;
+  }
+  .stat-number {
+    font-family: 'Fredoka One', cursive;
+    font-size: 36px;
+    color: var(--yellow);
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  /* Celebration */
+  .goal-flash {
+    position: fixed;
+    inset: 0;
+    background: rgba(46,204,113,0.2);
+    z-index: 999;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s;
+  }
+  .goal-flash.active { opacity: 1; }
+
+  /* Mobile touch buttons */
+  .touch-controls {
+    display: none;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(0,0,0,0.2);
+    flex-wrap: wrap;
+  }
+  .touch-btn {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 12px;
+    padding: 12px 20px;
+    color: white;
+    font-family: 'Fredoka One', cursive;
+    font-size: 18px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: background 0.1s;
+  }
+  .touch-btn:active { background: rgba(46,204,113,0.3); }
+
+  @media (max-width: 600px) {
+    .touch-controls { display: flex; }
+  }
+
+  /* Decorative football emojis */
+  .deco {
+    position: fixed;
+    font-size: 40px;
+    opacity: 0.06;
+    pointer-events: none;
+    z-index: 0;
+    animation: drift linear infinite;
+  }
+  @keyframes drift {
+    from { transform: translateY(100vh) rotate(0deg); }
+    to { transform: translateY(-120vh) rotate(720deg); }
+  }
+
+  /* ---- Scribble Tool ---- */
+  .scribble-section {
+    position: relative;
+    z-index: 10;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 20px 80px;
+  }
+
+  .scribble-heading {
+    text-align: center;
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(32px, 7vw, 56px);
+    color: white;
+    text-shadow: 3px 3px 0 var(--pink), 6px 6px 0 rgba(0,0,0,0.3);
+    margin-bottom: 8px;
+  }
+  .scribble-heading span { color: var(--pink); }
+
+  .scribble-subtitle {
+    text-align: center;
+    font-size: 16px;
+    color: rgba(255,255,255,0.6);
+    font-weight: 600;
+    margin-bottom: 24px;
+  }
+
+  .scribble-card {
+    background: rgba(255,255,255,0.05);
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+
+  .scribble-toolbar {
+    background: linear-gradient(135deg, #6c1fa8, #a01f8a);
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .toolbar-label {
+    font-family: 'Fredoka One', cursive;
+    font-size: 15px;
+    color: rgba(255,255,255,0.8);
+    white-space: nowrap;
+  }
+
+  .colour-palette {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    flex: 1;
+  }
+
+  .colour-btn {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    cursor: pointer;
+    transition: transform 0.15s, border-color 0.15s;
+    flex-shrink: 0;
+  }
+  .colour-btn:hover { transform: scale(1.25); }
+  .colour-btn.active {
+    border-color: white;
+    transform: scale(1.3);
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.4);
+  }
+
+  .toolbar-divider {
+    width: 1px; height: 30px;
+    background: rgba(255,255,255,0.2);
+    flex-shrink: 0;
+  }
+
+  .size-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .size-btn {
+    background: rgba(255,255,255,0.15);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    transition: background 0.15s, transform 0.15s;
+    flex-shrink: 0;
+  }
+  .size-btn:hover { background: rgba(255,255,255,0.3); transform: scale(1.1); }
+  .size-btn.sm { width: 26px; height: 26px; font-size: 14px; }
+  .size-btn.lg { width: 34px; height: 34px; font-size: 20px; }
+
+  .size-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+  }
+  .size-dot {
+    background: white;
+    border-radius: 50%;
+    transition: width 0.15s, height 0.15s;
+  }
+
+  .tool-btns {
+    display: flex;
+    gap: 8px;
+  }
+
+  .tool-btn {
+    background: rgba(255,255,255,0.15);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    color: white;
+    font-family: 'Fredoka One', cursive;
+    font-size: 13px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .tool-btn:hover { background: rgba(255,255,255,0.25); }
+  .tool-btn.active { border-color: white; background: rgba(255,255,255,0.25); }
+
+  #scribbleCanvas {
+    display: block;
+    width: 100%;
+    background: #fff;
+    cursor: crosshair;
+    touch-action: none;
+  }
+
+  .scribble-footer {
+    background: rgba(0,0,0,0.3);
+    padding: 12px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .scribble-hint {
+    font-size: 13px;
+    color: rgba(255,255,255,0.45);
+    font-weight: 600;
+  }
+
+  .scribble-actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  .btn-pink {
+    background: linear-gradient(135deg, #ff6b9d, #c0392b);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 9px 22px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 15px rgba(255,107,157,0.4);
+  }
+  .btn-pink:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255,107,157,0.5); }
+
+  .btn-outline {
+    background: transparent;
+    color: rgba(255,255,255,0.7);
+    border: 2px solid rgba(255,255,255,0.25);
+    border-radius: 50px;
+    padding: 7px 22px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-outline:hover { border-color: white; color: white; }
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+<div class="goal-flash" id="goalFlash"></div>
+
+<!-- Drifting footballs -->
+<div class="deco" style="left:5%;animation-duration:18s;animation-delay:0s;">⚽</div>
+<div class="deco" style="left:20%;animation-duration:22s;animation-delay:4s;">⚽</div>
+<div class="deco" style="left:40%;animation-duration:16s;animation-delay:9s;">⚽</div>
+<div class="deco" style="left:65%;animation-duration:25s;animation-delay:2s;">⚽</div>
+<div class="deco" style="left:85%;animation-duration:20s;animation-delay:7s;">⚽</div>
+
+<header>
+  <div class="title-badge">⭐ Skylar's World ⭐</div>
+  <h1>KICK <span>IT!</span></h1>
+  <p class="subtitle">Score as many goals as you can ⚽🏆</p>
+</header>
+
+<div class="game-section">
+  <div class="game-card">
+    <div class="game-header">
+      <div class="game-title">⚽ Penalty Shootout</div>
+      <div class="score-board">
+        <div>
+          <div class="score-pill" id="scoreDisplay">0</div>
+          <div class="score-label">Score</div>
+        </div>
+        <div>
+          <div class="score-pill" id="highScoreDisplay">0</div>
+          <div class="score-label">Best</div>
+        </div>
+        <div>
+          <div class="score-pill" id="shotsDisplay">5</div>
+          <div class="score-label">Shots Left</div>
+        </div>
+      </div>
+    </div>
+
+    <canvas id="gameCanvas" width="820" height="480"></canvas>
+
+    <div class="touch-controls">
+      <div class="touch-btn" id="leftBtn">⬅ Left</div>
+      <div class="touch-btn" id="kickBtn">⚽ SHOOT!</div>
+      <div class="touch-btn" id="rightBtn">Right ➡</div>
+    </div>
+
+    <div class="game-footer">
+      <div class="controls-hint">
+        <span>← →</span> Aim &nbsp;|&nbsp; <span>SPACE</span> or <span>Click</span> to Shoot
+      </div>
+      <button class="btn" id="restartBtn">🔄 Play Again</button>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-number" id="totalGoals">0</div>
+      <div class="stat-label">Total Goals</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="totalShots">0</div>
+      <div class="stat-label">Total Shots</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="accuracy">0%</div>
+      <div class="stat-label">Accuracy</div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SCRIBBLE SECTION ====== -->
+<div class="scribble-section">
+  <h2 class="scribble-heading">🎨 SCRIB<span>BLE!</span></h2>
+  <p class="scribble-subtitle">Draw anything you like — go wild with colours! 🌈</p>
+
+  <div class="scribble-card">
+    <div class="scribble-toolbar">
+      <span class="toolbar-label">🎨 Colour:</span>
+
+      <div class="colour-palette" id="colourPalette"></div>
+
+      <div class="toolbar-divider"></div>
+
+      <div class="size-controls">
+        <button class="size-btn sm" id="sizeDown">−</button>
+        <div class="size-preview"><div class="size-dot" id="sizeDot"></div></div>
+        <button class="size-btn lg" id="sizeUp">+</button>
+      </div>
+
+      <div class="toolbar-divider"></div>
+
+      <div class="tool-btns">
+        <button class="tool-btn active" id="toolPen">✏️ Draw</button>
+        <button class="tool-btn" id="toolEraser">🧹 Erase</button>
+        <button class="tool-btn" id="toolFill">🪣 Fill</button>
+      </div>
+    </div>
+
+    <canvas id="scribbleCanvas"></canvas>
+
+    <div class="scribble-footer">
+      <span class="scribble-hint">Draw freely — use your finger on mobile too! 📱</span>
+      <div class="scribble-actions">
+        <button class="btn-outline" id="undoBtn">↩ Undo</button>
+        <button class="btn-outline" id="clearBtn">🗑 Clear</button>
+        <button class="btn-pink" id="saveBtn">💾 Save Drawing</button>
+      </div>
+    </div>
+  </div>
+</div>
+// ---- Stars ----
+const starsEl = document.getElementById('stars');
+for (let i = 0; i < 80; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  s.style.left = Math.random() * 100 + '%';
+  s.style.top = Math.random() * 100 + '%';
+  s.style.animationDelay = Math.random() * 3 + 's';
+  s.style.animationDuration = (2 + Math.random() * 3) + 's';
+  starsEl.appendChild(s);
+}
+
+// ---- Sound Engine (Web Audio API - no files needed) ----
+let audioCtx = null;
+
+function getAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playKick() {
+  const ac = getAudio();
+  const buf = ac.createBuffer(1, ac.sampleRate * 0.18, ac.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) {
+    const t = i / ac.sampleRate;
+    // Thud + high snap
+    d[i] = (Math.random() * 2 - 1) * Math.exp(-t * 35) * 0.9
+          + Math.sin(2 * Math.PI * 180 * t) * Math.exp(-t * 25) * 0.6;
+  }
+  const src = ac.createBufferSource();
+  src.buffer = buf;
+  const gain = ac.createGain();
+  gain.gain.setValueAtTime(1, ac.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.18);
+  src.connect(gain); gain.connect(ac.destination);
+  src.start();
+}
+
+function playCrowd() {
+  // Crowd roar for goal
+  const ac = getAudio();
+  const duration = 1.4;
+  const buf = ac.createBuffer(1, ac.sampleRate * duration, ac.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) {
+    const t = i / ac.sampleRate;
+    d[i] = (Math.random() * 2 - 1)
+      * (0.3 + 0.7 * Math.min(t * 4, 1))           // swell in
+      * Math.exp(-t * 0.8)                           // fade out
+      * (1 + 0.3 * Math.sin(2 * Math.PI * 8 * t));  // wave
+  }
+  const src = ac.createBufferSource();
+  src.buffer = buf;
+  // Bandpass to make it sound more crowd-like
+  const filter = ac.createBiquadFilter();
+  filter.type = 'bandpass';
+  filter.frequency.value = 900;
+  filter.Q.value = 0.4;
+  const gain = ac.createGain();
+  gain.gain.setValueAtTime(0.55, ac.currentTime);
+  src.connect(filter); filter.connect(gain); gain.connect(ac.destination);
+  src.start();
+}
+
+function playGoalJingle() {
+  // Short triumphant melody
+  const ac = getAudio();
+  const notes = [523, 659, 784, 1047]; // C5 E5 G5 C6
+  notes.forEach((freq, i) => {
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.type = 'square';
+    osc.frequency.value = freq;
+    const t = ac.currentTime + i * 0.13;
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(0.18, t + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+    osc.connect(gain); gain.connect(ac.destination);
+    osc.start(t); osc.stop(t + 0.25);
+  });
+}
+
+function playSaved() {
+  // Descending "aww" tone
+  const ac = getAudio();
+  const osc = ac.createOscillator();
+  const gain = ac.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(440, ac.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(220, ac.currentTime + 0.4);
+  gain.gain.setValueAtTime(0.3, ac.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.45);
+  osc.connect(gain); gain.connect(ac.destination);
+  osc.start(); osc.stop(ac.currentTime + 0.5);
+}
+
+function playMiss() {
+  // Low thud miss
+  const ac = getAudio();
+  const osc = ac.createOscillator();
+  const gain = ac.createGain();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(120, ac.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(60, ac.currentTime + 0.3);
+  gain.gain.setValueAtTime(0.25, ac.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.35);
+  osc.connect(gain); gain.connect(ac.destination);
+  osc.start(); osc.stop(ac.currentTime + 0.4);
+}
+
+function playWhistle() {
+  const ac = getAudio();
+  const osc = ac.createOscillator();
+  const gain = ac.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(2800, ac.currentTime);
+  osc.frequency.linearRampToValueAtTime(3200, ac.currentTime + 0.08);
+  osc.frequency.linearRampToValueAtTime(2800, ac.currentTime + 0.18);
+  gain.gain.setValueAtTime(0.22, ac.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.22);
+  osc.connect(gain); gain.connect(ac.destination);
+  osc.start(); osc.stop(ac.currentTime + 0.25);
+}
+
+function playFullTimeWhistle() {
+  const ac = getAudio();
+  [0, 0.28, 0.56].forEach(delay => {
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = 2900;
+    const t = ac.currentTime + delay;
+    gain.gain.setValueAtTime(0.22, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+    osc.connect(gain); gain.connect(ac.destination);
+    osc.start(t); osc.stop(t + 0.25);
+  });
+}
+
+// ---- Game ----
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+// Responsive canvas
+function resizeCanvas() {
+  const w = canvas.parentElement.offsetWidth;
+  canvas.width = w;
+  canvas.height = Math.round(w * 0.585);
+}
+resizeCanvas();
+window.addEventListener('resize', () => { resizeCanvas(); initGame(); });
+
+let W, H, goalX, goalY, goalW, goalH, postR;
+let ball, keeper, state, score, shots, highScore, totalGoals, totalShots;
+let aimDir = 0; // -1 left, 0 centre, 1 right
+let chargeTimer = 0;
+let ballAnim = null;
+let confetti = [];
+let message = '';
+let messageFade = 0;
+
+function initGame() {
+  W = canvas.width;
+  H = canvas.height;
+
+  // Goal dimensions
+  goalW = W * 0.55;
+  goalH = H * 0.35;
+  goalX = (W - goalW) / 2;
+  goalY = H * 0.07;
+  postR = 6;
+
+  ball = {
+    x: W / 2,
+    y: H - H * 0.14,
+    r: W * 0.028,
+    vx: 0, vy: 0,
+    flying: false,
+    rotation: 0,
+    targetX: 0, targetY: 0,
+    progress: 0,
+    startX: 0, startY: 0
+  };
+
+  keeper = {
+    x: W / 2,
+    w: W * 0.11,
+    h: H * 0.18,
+    y: goalY + goalH * 0.1,
+    speed: W * 0.012,
+    dir: 1,
+    diving: false,
+    diveX: 0,
+    diveProgress: 0,
+    saved: false
+  };
+
+  state = 'aim'; // aim, shooting, result, gameover
+  if (score === undefined) score = 0;
+  if (shots === undefined) shots = 5;
+  if (highScore === undefined) highScore = 0;
+
+  aimDir = 0;
+  chargeTimer = 0;
+  confetti = [];
+  message = '';
+  messageFade = 0;
+}
+
+function resetRound() {
+  score = 0;
+  shots = 5;
+  state = 'aim';
+  aimDir = 0;
+  ball.flying = false;
+  ball.x = W / 2;
+  ball.y = H - H * 0.14;
+  keeper.diving = false;
+  keeper.saved = false;
+  keeper.x = W / 2;
+  confetti = [];
+  updateUI();
+}
+
+function updateUI() {
+  document.getElementById('scoreDisplay').textContent = score;
+  document.getElementById('shotsDisplay').textContent = shots;
+  document.getElementById('highScoreDisplay').textContent = highScore;
+  document.getElementById('totalGoals').textContent = totalGoals || 0;
+  document.getElementById('totalShots').textContent = totalShots || 0;
+  const acc = totalShots ? Math.round((totalGoals / totalShots) * 100) : 0;
+  document.getElementById('accuracy').textContent = acc + '%';
+}
+
+// ---- Drawing helpers ----
+function drawPitch() {
+  // Grass gradient
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, '#1e7a38');
+  grad.addColorStop(1, '#166b30');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Pitch stripes
+  ctx.globalAlpha = 0.07;
+  for (let i = 0; i < 8; i++) {
+    if (i % 2 === 0) {
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(i * (W / 8), 0, W / 8, H);
+    }
+  }
+  ctx.globalAlpha = 1;
+
+  // Penalty spot
+  ctx.beginPath();
+  ctx.arc(W / 2, H - H * 0.14, 5, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.fill();
+
+  // Penalty box
+  const boxW = W * 0.65, boxH = H * 0.55;
+  const boxX = (W - boxW) / 2, boxY = 0;
+  ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(boxX, boxY, boxW, boxH);
+
+  // Semi circle
+  ctx.beginPath();
+  ctx.arc(W / 2, H - H * 0.14, H * 0.2, Math.PI, 0);
+  ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+  ctx.stroke();
+}
+
+function drawNet() {
+  // Net lines
+  ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+  ctx.lineWidth = 1;
+  const cols = 12, rows = 7;
+  for (let c = 0; c <= cols; c++) {
+    const x = goalX + (c / cols) * goalW;
+    ctx.beginPath();
+    ctx.moveTo(x, goalY);
+    ctx.lineTo(x, goalY + goalH);
+    ctx.stroke();
+  }
+  for (let r = 0; r <= rows; r++) {
+    const y = goalY + (r / rows) * goalH;
+    ctx.beginPath();
+    ctx.moveTo(goalX, y);
+    ctx.lineTo(goalX + goalW, y);
+    ctx.stroke();
+  }
+}
+
+function drawGoalPosts() {
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = postR;
+  ctx.lineCap = 'round';
+
+  // Left post
+  ctx.beginPath();
+  ctx.moveTo(goalX, goalY);
+  ctx.lineTo(goalX, goalY + goalH);
+  ctx.stroke();
+
+  // Right post
+  ctx.beginPath();
+  ctx.moveTo(goalX + goalW, goalY);
+  ctx.lineTo(goalX + goalW, goalY + goalH);
+  ctx.stroke();
+
+  // Crossbar
+  ctx.beginPath();
+  ctx.moveTo(goalX, goalY);
+  ctx.lineTo(goalX + goalW, goalY);
+  ctx.stroke();
+
+  // Post highlights
+  ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(goalX + 2, goalY);
+  ctx.lineTo(goalX + 2, goalY + goalH);
+  ctx.stroke();
+}
+
+function drawKeeper() {
+  const kx = keeper.x;
+  const ky = keeper.y;
+  const kw = keeper.w;
+  const kh = keeper.h;
+
+  ctx.save();
+  if (keeper.diving) {
+    const angle = keeper.dir > 0 ? 0.5 : -0.5;
+    ctx.translate(keeper.x, ky + kh / 2);
+    ctx.rotate(angle * keeper.diveProgress);
+    ctx.translate(-keeper.x, -(ky + kh / 2));
+  }
+
+  // Body - keeper kit (yellow)
+  ctx.fillStyle = '#f9ca24';
+  ctx.beginPath();
+  ctx.roundRect(kx - kw / 2, ky + kh * 0.3, kw, kh * 0.55, 6);
+  ctx.fill();
+
+  // Shorts
+  ctx.fillStyle = '#2d3436';
+  ctx.fillRect(kx - kw / 2 + 4, ky + kh * 0.72, kw - 8, kh * 0.13);
+
+  // Head
+  const headR = kw * 0.32;
+  ctx.fillStyle = '#f4c896';
+  ctx.beginPath();
+  ctx.arc(kx, ky + kh * 0.2, headR, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Eyes
+  ctx.fillStyle = '#2d3436';
+  ctx.beginPath();
+  ctx.arc(kx - headR * 0.3, ky + kh * 0.17, 3, 0, Math.PI * 2);
+  ctx.arc(kx + headR * 0.3, ky + kh * 0.17, 3, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Gloves
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.arc(kx - kw * 0.55, ky + kh * 0.42, kw * 0.15, 0, Math.PI * 2);
+  ctx.arc(kx + kw * 0.55, ky + kh * 0.42, kw * 0.15, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+function drawBall(bx, by) {
+  const r = ball.r;
+  ctx.save();
+  ctx.translate(bx, by);
+  ctx.rotate(ball.rotation);
+
+  // Shadow
+  ctx.beginPath();
+  ctx.ellipse(0, r * 0.3, r * 1.1, r * 0.35, 0, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(0,0,0,0.3)';
+  ctx.fill();
+
+  // Ball
+  ctx.beginPath();
+  ctx.arc(0, 0, r, 0, Math.PI * 2);
+  const grad = ctx.createRadialGradient(-r * 0.3, -r * 0.3, r * 0.1, 0, 0, r);
+  grad.addColorStop(0, '#ffffff');
+  grad.addColorStop(0.6, '#f0f0f0');
+  grad.addColorStop(1, '#c0c0c0');
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Pentagons
+  ctx.fillStyle = '#1e272e';
+  const hexPts = (cx, cy, s) => {
+    ctx.beginPath();
+    for (let i = 0; i < 5; i++) {
+      const a = (i * Math.PI * 2) / 5 - Math.PI / 2;
+      const x = cx + Math.cos(a) * s;
+      const y = cy + Math.sin(a) * s;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fill();
+  };
+  hexPts(0, 0, r * 0.32);
+  hexPts(r * 0.45, -r * 0.35, r * 0.2);
+  hexPts(-r * 0.5, -r * 0.2, r * 0.18);
+  hexPts(r * 0.15, r * 0.5, r * 0.18);
+  hexPts(-r * 0.3, r * 0.45, r * 0.16);
+
+  ctx.restore();
+}
+
+function drawAimArrow() {
+  if (state !== 'aim') return;
+  const bx = ball.x, by = ball.y;
+  let tx;
+  if (aimDir === 0) tx = W / 2;
+  else if (aimDir === -1) tx = goalX + goalW * 0.18;
+  else tx = goalX + goalW * 0.82;
+  const ty = goalY + goalH * 0.5;
+
+  ctx.save();
+  ctx.strokeStyle = 'rgba(249,202,36,0.6)';
+  ctx.lineWidth = 3;
+  ctx.setLineDash([10, 6]);
+  ctx.beginPath();
+  ctx.moveTo(bx, by - ball.r);
+  ctx.lineTo(tx, ty);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Arrowhead
+  const angle = Math.atan2(ty - by, tx - bx);
+  ctx.fillStyle = 'rgba(249,202,36,0.8)';
+  ctx.beginPath();
+  ctx.translate(tx, ty);
+  ctx.rotate(angle);
+  ctx.moveTo(0, 0);
+  ctx.lineTo(-12, -7);
+  ctx.lineTo(-12, 7);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawAimSelector() {
+  if (state !== 'aim') return;
+  const zones = [
+    { label: '← Left', x: goalX + goalW * 0.15, selected: aimDir === -1 },
+    { label: '⬆ Centre', x: W / 2, selected: aimDir === 0 },
+    { label: 'Right →', x: goalX + goalW * 0.85, selected: aimDir === 1 }
+  ];
+  zones.forEach(z => {
+    ctx.save();
+    ctx.fillStyle = z.selected ? 'rgba(249,202,36,0.9)' : 'rgba(255,255,255,0.25)';
+    ctx.beginPath();
+    ctx.roundRect(z.x - 45, goalY + goalH + 10, 90, 28, 8);
+    ctx.fill();
+    ctx.fillStyle = z.selected ? '#1e272e' : 'rgba(255,255,255,0.8)';
+    ctx.font = 'bold 13px Nunito, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(z.label, z.x, goalY + goalH + 24);
+    ctx.restore();
+  });
+}
+
+function drawMessage() {
+  if (!message || messageFade <= 0) return;
+  ctx.save();
+  ctx.globalAlpha = Math.min(1, messageFade / 30);
+  ctx.font = `bold ${W * 0.08}px Fredoka One, cursive`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  // Shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  ctx.fillText(message, W / 2 + 3, H * 0.52 + 3);
+
+  // Text
+  if (message.includes('GOAL')) ctx.fillStyle = '#f9ca24';
+  else if (message.includes('SAVED') || message.includes('MISS')) ctx.fillStyle = '#ff6b9d';
+  else ctx.fillStyle = '#ffffff';
+  ctx.fillText(message, W / 2, H * 0.52);
+  ctx.restore();
+}
+
+function drawGameOver() {
+  if (state !== 'gameover') return;
+  ctx.save();
+  ctx.fillStyle = 'rgba(0,0,0,0.65)';
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#f9ca24';
+  ctx.font = `bold ${W * 0.07}px Fredoka One, cursive`;
+  ctx.fillText('⭐ Full Time! ⭐', W / 2, H * 0.32);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = `bold ${W * 0.05}px Fredoka One, cursive`;
+  ctx.fillText(`You scored ${score} / 5 goals!`, W / 2, H * 0.48);
+
+  if (score === 5) {
+    ctx.fillStyle = '#2ecc71';
+    ctx.font = `bold ${W * 0.04}px Nunito, sans-serif`;
+    ctx.fillText('🏆 PERFECT SCORE! YOU\'RE AMAZING! 🏆', W / 2, H * 0.62);
+  } else if (score >= 3) {
+    ctx.fillStyle = '#74b9ff';
+    ctx.font = `bold ${W * 0.035}px Nunito, sans-serif`;
+    ctx.fillText('Great shooting! ⚽', W / 2, H * 0.62);
+  } else {
+    ctx.fillStyle = '#dfe6e9';
+    ctx.font = `bold ${W * 0.035}px Nunito, sans-serif`;
+    ctx.fillText('Keep practising! You\'ll get them next time 💪', W / 2, H * 0.62);
+  }
+
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.font = `${W * 0.025}px Nunito, sans-serif`;
+  ctx.fillText('Press Play Again to try again!', W / 2, H * 0.76);
+  ctx.restore();
+}
+
+function spawnConfetti(x, y) {
+  for (let i = 0; i < 40; i++) {
+    confetti.push({
+      x, y,
+      vx: (Math.random() - 0.5) * 12,
+      vy: -(Math.random() * 10 + 4),
+      r: Math.random() * 8 + 4,
+      color: ['#f9ca24','#2ecc71','#74b9ff','#ff6b9d','#ffffff'][Math.floor(Math.random() * 5)],
+      life: 1, decay: Math.random() * 0.02 + 0.015,
+      shape: Math.random() > 0.5 ? 'circle' : 'rect'
+    });
+  }
+}
+
+function updateConfetti() {
+  confetti.forEach(c => {
+    c.x += c.vx;
+    c.y += c.vy;
+    c.vy += 0.4;
+    c.life -= c.decay;
+  });
+  confetti = confetti.filter(c => c.life > 0);
+}
+
+function drawConfetti() {
+  confetti.forEach(c => {
+    ctx.save();
+    ctx.globalAlpha = c.life;
+    ctx.fillStyle = c.color;
+    if (c.shape === 'circle') {
+      ctx.beginPath();
+      ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      ctx.translate(c.x, c.y);
+      ctx.rotate(c.life * 5);
+      ctx.fillRect(-c.r / 2, -c.r / 2, c.r, c.r);
+    }
+    ctx.restore();
+  });
+}
+
+// ---- Game logic ----
+function getBallTarget() {
+  let tx;
+  const spread = goalW * 0.35;
+  if (aimDir === 0) tx = goalX + goalW * 0.5 + (Math.random() - 0.5) * goalW * 0.25;
+  else if (aimDir === -1) tx = goalX + goalW * 0.15 + Math.random() * goalW * 0.18;
+  else tx = goalX + goalW * 0.67 + Math.random() * goalW * 0.18;
+  const ty = goalY + goalH * 0.15 + Math.random() * goalH * 0.6;
+  return { tx, ty };
+}
+
+function shootBall() {
+  if (state !== 'aim' || shots <= 0) return;
+  state = 'shooting';
+  shots--;
+  totalShots = (totalShots || 0) + 1;
+  playKick();
+
+  const { tx, ty } = getBallTarget();
+  ball.startX = ball.x;
+  ball.startY = ball.y;
+  ball.targetX = tx;
+  ball.targetY = ty;
+  ball.progress = 0;
+  ball.flying = true;
+
+  // Keeper AI
+  keeper.diving = true;
+  keeper.diveProgress = 0;
+  const keeperDecide = Math.random();
+  keeper.dir = keeperDecide > 0.55 ? (aimDir === -1 ? 1 : -1) : (aimDir === -1 ? -1 : 1);
+  if (aimDir === 0) keeper.dir = Math.random() > 0.5 ? 1 : -1;
+  keeper.diveX = keeper.dir > 0
+    ? goalX + goalW * 0.82
+    : goalX + goalW * 0.18;
+  keeper.saved = false;
+}
+
+function lerp(a, b, t) { return a + (b - a) * t; }
+
+function easeInOut(t) { return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t; }
+
+let lastTime = 0;
+
+function update(ts) {
+  const dt = Math.min((ts - lastTime) / 16.67, 3);
+  lastTime = ts;
+
+  // Keeper sway when aiming
+  if (state === 'aim') {
+    keeper.x += keeper.speed * keeper.dir * dt;
+    if (keeper.x > goalX + goalW * 0.8) keeper.dir = -1;
+    if (keeper.x < goalX + goalW * 0.2) keeper.dir = 1;
+  }
+
+  // Ball in flight
+  if (ball.flying && state === 'shooting') {
+    ball.progress = Math.min(ball.progress + 0.035 * dt, 1);
+    const t = easeInOut(ball.progress);
+    ball.x = lerp(ball.startX, ball.targetX, t);
+    ball.y = lerp(ball.startY, ball.targetY, t);
+
+    // Arc
+    const arc = Math.sin(ball.progress * Math.PI) * H * 0.15;
+    ball.y -= arc * (1 - ball.progress * 0.5);
+
+    // Scale
+    ball.r = W * 0.028 * (1 - ball.progress * 0.3);
+    ball.rotation += 0.15 * dt;
+
+    // Keeper dive
+    if (keeper.diving) {
+      keeper.diveProgress = Math.min(keeper.diveProgress + 0.05 * dt, 1);
+      keeper.x = lerp(keeper.x, keeper.diveX, keeper.diveProgress * 0.1);
+    }
+
+    if (ball.progress >= 1) {
+      ball.flying = false;
+      resolveShot();
+    }
+  }
+
+  // Message fade
+  if (messageFade > 0) messageFade -= dt;
+
+  updateConfetti();
+}
+
+function resolveShot() {
+  // Check if keeper saved it
+  const kx = keeper.x;
+  const ky = keeper.y;
+  const kw = keeper.w;
+  const kh = keeper.h;
+
+  const ballInGoal = ball.x > goalX && ball.x < goalX + goalW
+    && ball.y > goalY && ball.y < goalY + goalH;
+
+  const keeperCaught = Math.abs(ball.x - kx) < kw * 0.7
+    && Math.abs(ball.y - (ky + kh / 2)) < kh * 0.7;
+
+  if (ballInGoal && !keeperCaught) {
+    // GOAL!
+    score++;
+    totalGoals = (totalGoals || 0) + 1;
+    if (score > highScore) highScore = score;
+    message = '⚽ GOAL! ⚽';
+    messageFade = 80;
+    spawnConfetti(ball.x, ball.y);
+    playGoalJingle();
+    playCrowd();
+    // Flash
+    const flash = document.getElementById('goalFlash');
+    flash.classList.add('active');
+    setTimeout(() => flash.classList.remove('active'), 200);
+  } else if (keeperCaught && ballInGoal) {
+    message = '🧤 SAVED!';
+    messageFade = 70;
+    playSaved();
+  } else {
+    message = '❌ MISS!';
+    messageFade = 70;
+    playMiss();
+  }
+
+  updateUI();
+
+  setTimeout(() => {
+    if (shots <= 0) {
+      state = 'gameover';
+      playFullTimeWhistle();
+    } else {
+      resetBall();
+      state = 'aim';
+    }
+  }, 1400);
+}
+
+function resetBall() {
+  ball.x = W / 2;
+  ball.y = H - H * 0.14;
+  ball.r = W * 0.028;
+  ball.flying = false;
+  keeper.diving = false;
+  keeper.saved = false;
+  aimDir = 0;
+}
+
+// ---- Render ----
+function render() {
+  ctx.clearRect(0, 0, W, H);
+  drawPitch();
+  drawNet();
+  drawGoalPosts();
+  drawKeeper();
+  drawBall(ball.x, ball.y);
+  drawAimArrow();
+  drawAimSelector();
+  drawConfetti();
+  drawMessage();
+  drawGameOver();
+}
+
+function loop(ts) {
+  update(ts);
+  render();
+  requestAnimationFrame(loop);
+}
+
+// ---- Controls ----
+document.addEventListener('keydown', e => {
+  if (e.code === 'ArrowLeft') { aimDir = -1; }
+  if (e.code === 'ArrowRight') { aimDir = 1; }
+  if (e.code === 'Space' || e.code === 'ArrowUp') {
+    e.preventDefault();
+    shootBall();
+  }
+});
+
+canvas.addEventListener('click', e => {
+  if (state === 'aim') {
+    const rect = canvas.getBoundingClientRect();
+    const cx = (e.clientX - rect.left) * (W / rect.width);
+    // Click left of centre = aim left, right = aim right
+    if (cx < W * 0.35) aimDir = -1;
+    else if (cx > W * 0.65) aimDir = 1;
+    else aimDir = 0;
+    setTimeout(shootBall, 150);
+  }
+});
+
+document.getElementById('restartBtn').addEventListener('click', () => {
+  score = 0; shots = 5;
+  resetBall();
+  keeper.x = W / 2;
+  state = 'aim';
+  confetti = [];
+  playWhistle();
+  updateUI();
+});
+
+// Touch controls
+document.getElementById('leftBtn').addEventListener('click', () => { aimDir = -1; });
+document.getElementById('rightBtn').addEventListener('click', () => { aimDir = 1; });
+document.getElementById('kickBtn').addEventListener('click', shootBall);
+
+// Init
+totalGoals = 0; totalShots = 0; highScore = 0;
+initGame();
+updateUI();
+requestAnimationFrame(loop);
+
+// ======== SCRIBBLE TOOL ========
+const COLOURS = [
+  '#ff4757','#ff6b81','#ff9f43','#feca57','#a3cb38',
+  '#2ecc71','#1abc9c','#54a0ff','#5f27cd','#ff6b9d',
+  '#ff6348','#eccc68','#48dbfb','#ff9ff3','#ffffff',
+  '#c8d6e5','#8395a7','#576574','#2d3436','#000000'
+];
+
+const sc = document.getElementById('scribbleCanvas');
+const sctx = sc.getContext('2d');
+let scW, scH;
+let painting = false;
+let scColour = '#ff4757';
+let scSize = 8;
+let scTool = 'pen'; // pen | eraser | fill
+let undoStack = [];
+
+function resizeScribble() {
+  const w = sc.parentElement.offsetWidth;
+  // Save current drawing
+  const img = sctx.getImageData(0, 0, sc.width, sc.height);
+  sc.width = w;
+  sc.height = Math.round(w * 0.55);
+  scW = sc.width; scH = sc.height;
+  // White background
+  sctx.fillStyle = '#ffffff';
+  sctx.fillRect(0, 0, scW, scH);
+  // Restore drawing if same size
+  try { sctx.putImageData(img, 0, 0); } catch(e) {}
+}
+
+function initScribble() {
+  resizeScribble();
+  buildPalette();
+  updateSizeDot();
+}
+
+function buildPalette() {
+  const palette = document.getElementById('colourPalette');
+  palette.innerHTML = '';
+  COLOURS.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'colour-btn' + (c === scColour ? ' active' : '');
+    btn.style.background = c;
+    if (c === '#ffffff') btn.style.border = '3px solid rgba(255,255,255,0.4)';
+    btn.title = c;
+    btn.addEventListener('click', () => {
+      scColour = c;
+      scTool = 'pen';
+      document.querySelectorAll('.colour-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      setActiveTool('pen');
+    });
+    palette.appendChild(btn);
+  });
+}
+
+function updateSizeDot() {
+  const dot = document.getElementById('sizeDot');
+  const s = Math.max(4, Math.min(scSize, 40));
+  dot.style.width = s + 'px';
+  dot.style.height = s + 'px';
+  dot.style.background = scTool === 'eraser' ? '#ccc' : scColour;
+}
+
+function setActiveTool(tool) {
+  scTool = tool;
+  document.getElementById('toolPen').classList.toggle('active', tool === 'pen');
+  document.getElementById('toolEraser').classList.toggle('active', tool === 'eraser');
+  document.getElementById('toolFill').classList.toggle('active', tool === 'fill');
+  sc.style.cursor = tool === 'fill' ? 'cell' : 'crosshair';
+  updateSizeDot();
+}
+
+function saveUndo() {
+  undoStack.push(sctx.getImageData(0, 0, scW, scH));
+  if (undoStack.length > 30) undoStack.shift();
+}
+
+function getScPos(e) {
+  const rect = sc.getBoundingClientRect();
+  const scaleX = sc.width / rect.width;
+  const scaleY = sc.height / rect.height;
+  if (e.touches) {
+    return {
+      x: (e.touches[0].clientX - rect.left) * scaleX,
+      y: (e.touches[0].clientY - rect.top) * scaleY
+    };
+  }
+  return {
+    x: (e.clientX - rect.left) * scaleX,
+    y: (e.clientY - rect.top) * scaleY
+  };
+}
+
+function startDraw(e) {
+  e.preventDefault();
+  const { x, y } = getScPos(e);
+  if (scTool === 'fill') {
+    saveUndo();
+    floodFill(Math.round(x), Math.round(y), scColour);
+    return;
+  }
+  saveUndo();
+  painting = true;
+  sctx.beginPath();
+  sctx.moveTo(x, y);
+  // Dot on click
+  sctx.lineCap = 'round';
+  sctx.lineJoin = 'round';
+  sctx.lineWidth = scTool === 'eraser' ? scSize * 3 : scSize;
+  sctx.strokeStyle = scTool === 'eraser' ? '#ffffff' : scColour;
+  sctx.lineTo(x + 0.1, y + 0.1);
+  sctx.stroke();
+}
+
+function draw(e) {
+  e.preventDefault();
+  if (!painting) return;
+  const { x, y } = getScPos(e);
+  sctx.lineTo(x, y);
+  sctx.stroke();
+}
+
+function stopDraw(e) {
+  if (painting) {
+    sctx.closePath();
+    painting = false;
+  }
+}
+
+// Flood fill (bucket tool)
+function floodFill(startX, startY, fillColour) {
+  const imageData = sctx.getImageData(0, 0, scW, scH);
+  const data = imageData.data;
+  const idx = (x, y) => (y * scW + x) * 4;
+
+  const sr = data[idx(startX, startY)];
+  const sg = data[idx(startX, startY) + 1];
+  const sb = data[idx(startX, startY) + 2];
+  const sa = data[idx(startX, startY) + 3];
+
+  // Parse fill colour
+  const tmp = document.createElement('canvas').getContext('2d');
+  tmp.fillStyle = fillColour;
+  tmp.fillRect(0, 0, 1, 1);
+  const fc = tmp.getImageData(0, 0, 1, 1).data;
+  const [fr, fg, fb, fa] = [fc[0], fc[1], fc[2], fc[3]];
+
+  if (sr === fr && sg === fg && sb === fb) return;
+
+  function match(x, y) {
+    const i = idx(x, y);
+    return Math.abs(data[i] - sr) < 32 &&
+           Math.abs(data[i+1] - sg) < 32 &&
+           Math.abs(data[i+2] - sb) < 32 &&
+           Math.abs(data[i+3] - sa) < 32;
+  }
+
+  const stack = [[startX, startY]];
+  const visited = new Uint8Array(scW * scH);
+
+  while (stack.length) {
+    const [x, y] = stack.pop();
+    if (x < 0 || x >= scW || y < 0 || y >= scH) continue;
+    if (visited[y * scW + x]) continue;
+    if (!match(x, y)) continue;
+    visited[y * scW + x] = 1;
+    const i = idx(x, y);
+    data[i] = fr; data[i+1] = fg; data[i+2] = fb; data[i+3] = fa;
+    stack.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]);
+  }
+  sctx.putImageData(imageData, 0, 0);
+}
+
+// Event listeners
+sc.addEventListener('mousedown', startDraw);
+sc.addEventListener('mousemove', draw);
+sc.addEventListener('mouseup', stopDraw);
+sc.addEventListener('mouseleave', stopDraw);
+sc.addEventListener('touchstart', startDraw, { passive: false });
+sc.addEventListener('touchmove', draw, { passive: false });
+sc.addEventListener('touchend', stopDraw);
+
+document.getElementById('sizeDown').addEventListener('click', () => {
+  scSize = Math.max(2, scSize - 3);
+  updateSizeDot();
+});
+document.getElementById('sizeUp').addEventListener('click', () => {
+  scSize = Math.min(60, scSize + 3);
+  updateSizeDot();
+});
+
+document.getElementById('toolPen').addEventListener('click', () => setActiveTool('pen'));
+document.getElementById('toolEraser').addEventListener('click', () => setActiveTool('eraser'));
+document.getElementById('toolFill').addEventListener('click', () => setActiveTool('fill'));
+
+document.getElementById('undoBtn').addEventListener('click', () => {
+  if (undoStack.length) {
+    sctx.putImageData(undoStack.pop(), 0, 0);
+  }
+});
+
+document.getElementById('clearBtn').addEventListener('click', () => {
+  saveUndo();
+  sctx.fillStyle = '#ffffff';
+  sctx.fillRect(0, 0, scW, scH);
+});
+
+document.getElementById('saveBtn').addEventListener('click', () => {
+  const link = document.createElement('a');
+  link.download = 'skylar-drawing.png';
+  link.href = sc.toDataURL('image/png');
+  link.click();
+});
+
+window.addEventListener('resize', resizeScribble);
+initScribble();
+</script>
+</body>
+</html>
