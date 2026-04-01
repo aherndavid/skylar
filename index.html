@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SKYLARAHERN.COM</title>
+    <title>SKYLAR AHERN.COM</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap');
 
@@ -19,39 +19,58 @@
         }
 
         h1 {
-            font-size: 5rem;
+            font-size: 6rem;
             margin: 0;
             text-transform: uppercase;
             text-align: center;
             line-height: 1;
-            
-            /* Gradient Logic */
+            letter-spacing: -9px;
+
+            /* 1. Define the Gradient with multiple shades */
             background: linear-gradient(
-                to bottom, 
-                #e0b0ff 0%,   /* Lighter Mauve */
-                #a020f0 50%,  /* Standard Purple */
-                #4b0082 100%  /* Deep Indigo/Purple */
+                45deg, 
+                #a020f0, /* Purple */
+                #e0b0ff, /* Mauve */
+                #4b0082, /* Indigo */
+                #d891ef, /* Bright Lavender */
+                #a020f0  /* Back to Purple for seamless loop */
             );
+
+            /* 2. Make the background large so we can move it */
+            background-size: 400% 400%;
+
+            /* 3. Clip the background to the text */
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            
-            /* Extra chunkiness */
-            letter-spacing: -3px;
+
+            /* 4. Apply the animation */
+            animation: gradientCycle 8s ease infinite;
         }
 
-        /* Responsive scaling for mobile */
-        @media (max-width: 900px) {
+        /* The Animation logic */
+        @keyframes gradientCycle {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @media (max-width: 800px) {
             h1 {
-                font-size: 5rem;
+                font-size: 3rem;
                 letter-spacing: -1px;
-                padding: 10px;
             }
         }
     </style>
 </head>
 <body>
 
-    <h1>SKYLAR AHERN.COM</h1>
+    <h1>SKYLA AHERN.COM</h1>
 
 </body>
 </html>
