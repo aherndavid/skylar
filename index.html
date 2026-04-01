@@ -3,36 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logo Loop</title>
+    <title>SKYLARAHERN.COM</title>
     <style>
-        /* Dark background and center the logo */
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #000;
+        @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap');
+
+        body {
+            background-color: #000000;
+            font-family: 'Archivo Black', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
+            height: 100vh;
+            margin: 0;
             overflow: hidden;
         }
 
-        /* Adjust the size of the logo here */
-        .logo-video {
-            width: 300px; /* Adjust width to your preference */
-            height: auto;
-            max-width: 80%; /* Responsive safeguard for mobile */
-            /* filter: drop-shadow(0 0 10px rgba(255,255,255,0.1)); */ /* Optional: adds a subtle glow */
+        h1 {
+            font-size: 6rem;
+            margin: 0;
+            text-transform: uppercase;
+            text-align: center;
+            line-height: 1;
+            
+            /* Gradient Logic */
+            background: linear-gradient(
+                to bottom, 
+                #e0b0ff 0%,   /* Lighter Mauve */
+                #a020f0 50%,  /* Standard Purple */
+                #4b0082 100%  /* Deep Indigo/Purple */
+            );
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            
+            /* Extra chunkiness */
+            letter-spacing: -3px;
+        }
+
+        /* Responsive scaling for mobile */
+        @media (max-width: 800px) {
+            h1 {
+                font-size: 3rem;
+                letter-spacing: -1px;
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <video class="logo-video" autoplay muted loop playsinline>
-        <source src="assets/your-logo-video.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
+    <h1>SKYLARAHERN.COM</h1>
 
 </body>
 </html>
